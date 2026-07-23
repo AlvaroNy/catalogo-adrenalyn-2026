@@ -128,8 +128,8 @@ for i, key in enumerate(ORDER):
 
 n_times = n_paises   # usado no template (stat)
 
-# lista para o "pedido rapido" (ordem numerica da colecao) -> [codigo, jogador]
-fast_json = json.dumps([[c["cod"], c["jog"]] for c in CARDS], ensure_ascii=False)
+# lista para o "pedido rapido" (ordem numerica da colecao) -> [codigo, jogador, numero]
+fast_json = json.dumps([[c["cod"], c["jog"], c["n"]] for c in CARDS], ensure_ascii=False)
 
 # ---------------- TEMPLATE ----------------
 HTML = f'''<!DOCTYPE html>
@@ -596,9 +596,9 @@ function fEsc(t){{return String(t).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;
 function buildFast(){{
   if(fastBuilt)return;fastBuilt=true;
   fastList.innerHTML=FAST.map(p=>{{
-    const n=p[0],nome=p[1];
-    return '<div class="frow" data-cod="'+fEsc(n)+'" data-nome="'+fEsc(nome)+'" data-preco="'+PRECO+'" data-fn="'+fEsc((n+' '+nome).toLowerCase())+'">'+
-      '<span class="fr-n">'+fEsc(n)+'</span><span class="fr-nome">'+fEsc(nome)+'</span>'+
+    const cod=p[0],nome=p[1],num=p[2];
+    return '<div class="frow" data-cod="'+fEsc(cod)+'" data-nome="'+fEsc(nome)+'" data-preco="'+PRECO+'" data-fn="'+fEsc((num+' '+cod+' '+nome).toLowerCase())+'">'+
+      '<span class="fr-n">'+fEsc(num)+'</span><span class="fr-nome">'+fEsc(nome)+'</span>'+
       '<button class="fr-add" type="button" data-add><i class="ti ti-plus"></i></button>'+
       '<div class="fr-qty"><button type="button" data-dec><i class="ti ti-minus"></i></button><span data-qty>1</span><button type="button" data-inc><i class="ti ti-plus"></i></button></div>'+
       '</div>';
@@ -621,9 +621,9 @@ document.getElementById('fastGo').onclick=()=>{{
   if(!ks.length){{document.getElementById('fastQ').focus();return;}}
   const nome=fastNome.value.trim();
   if(!nome){{fastNome.classList.add('err');fastNome.placeholder='Por favor, digite seu nome';fastNome.focus();return;}}
-  const ord={{}};FAST.forEach((p,i)=>ord[p[0]]=i);
+  const ord={{}},FNUM={{}};FAST.forEach((p,i)=>{{ord[p[0]]=i;FNUM[p[0]]=p[2];}});
   const lines=ks.slice().sort((a,b)=>(ord[a]==null?1e9:ord[a])-(ord[b]==null?1e9:ord[b]))
-    .map(cod=>{{const it=cart[cod];return cod+' - '+it.nome+(it.qty>1?' ('+it.qty+'x)':'');}});
+    .map(cod=>{{const it=cart[cod];const num=FNUM[cod]==null?cod:FNUM[cod];return num+' - '+it.nome+(it.qty>1?' ('+it.qty+'x)':'');}});
   const tt=totals();
   const msg='*Pedido rápido de Cards - '+nome+'*\\n\\n'+lines.join('\\n')+'\\n\\n*Total: '+tt.n+' cards - '+fmt(tt.t)+'*';
   window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(msg),'_blank');
