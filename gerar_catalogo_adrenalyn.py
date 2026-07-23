@@ -15,6 +15,7 @@ SUBTITULO  = "Cards avulsas Panini World Cup 2026 — Adrenalyn XL"
 REFERENCIA = "Coleção Adrenalyn XL 2026"
 ATUALIZADO = "22/07/2026"
 PRECO_UNIT = 1.00                      # preco por carta (por enquanto R$ 1)
+CARD_MAX   = 630                       # mostra apenas cards ate este numero (None = todos)
 WHATSAPP   = "5537991716781"           # so numeros, 55 + DDD + numero
 WHATSAPP_F = "(37) 99171-6781"
 INSTAGRAM  = "seu_instagram"           # placeholder
@@ -60,6 +61,8 @@ with open(ARQ_DADOS, encoding="utf-8") as f:
     RAW = json.load(f)
 COLECAO = RAW.get("colecao", REFERENCIA)
 CARDS = RAW["cartas"]          # [{n, cod, jog, sel, var, pos, rar, img}, ...]
+if CARD_MAX is not None:
+    CARDS = [c for c in CARDS if c["n"] <= CARD_MAX]
 total = len(CARDS)
 com_foto = sum(1 for c in CARDS if c["img"])
 
